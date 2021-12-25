@@ -18,6 +18,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.lang.reflect.Type;
@@ -53,7 +54,7 @@ public class BenchmarkDecoder {
     @Measurement(iterations = 10, time = 1)
     @Fork(3)
     @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void decode() throws Exception {
         fetch(decoder.decode(response, type));
     }
