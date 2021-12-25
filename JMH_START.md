@@ -4,6 +4,8 @@
 
 [官网DEMO](http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/)
 
+[JMH应用指南](https://dunwu.github.io/javatech/test/jmh.html)
+
 可视化：
  - [JMH Visual Chart](http://deepoove.com/jmh-visual-chart/)
  - [JMH Visualizer](https://jmh.morethan.io/)
