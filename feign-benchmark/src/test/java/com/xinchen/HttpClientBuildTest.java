@@ -1,5 +1,6 @@
 package com.xinchen;
 
+import com.xinchen.builder.MyCachingHttpClientBuilder;
 import org.apache.http.client.cache.CacheResponseStatus;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
@@ -9,7 +10,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.cache.CacheConfig;
-import org.apache.http.impl.client.cache.CachingHttpClientBuilder;
+import org.apache.http.impl.client.cache.CachingExec;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
@@ -17,12 +18,23 @@ import org.junit.Test;
 import java.io.IOException;
 
 /**
+ *
+ * 注意： 根据header中的 Cache-Control 控制缓存
+ * Cache-Control： https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control
+ *
+ * 注意观察{@link CachingExec}的执行过程，主要在 handleCacheHit() 方法调用中判断是否使用缓存，以请求的header中的Cache-Control为判断条件
+ *
+ *
+ * 以下两个值必须添加：
+ * Cache-Control: max-age=<seconds>
+ * Cache-Control: max-stale=[=<seconds>]
+ *
  * @author Xin Chen (xinchenmelody@gmail.com)
  * @version 1.0
  * @date Created In 2021/12/26 12:08
  */
 public class HttpClientBuildTest {
-    private static final String url = "http://localhost:9000/get";
+    private static final String url = "http://httpbin.org/get";
     private static final RequestConfig requestConfig = RequestConfig.custom()
             // SocketTimeoutException: connect timed out
             .setConnectTimeout(10000)
@@ -32,6 +44,9 @@ public class HttpClientBuildTest {
     private static final HttpUriRequest request = RequestBuilder
             .create("GET")
             .setUri(url)
+            // 添加缓存 - 这两个值一定要添加才会生效
+            .addHeader("Cache-Control","max-age=100")
+            .addHeader("Cache-Control","max-stale=100")
             .setConfig(requestConfig)
             .build();
 
@@ -75,7 +90,7 @@ public class HttpClientBuildTest {
         PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
 
 
-        CloseableHttpClient cacheHttpClient = CachingHttpClientBuilder.create()
+        CloseableHttpClient cacheHttpClient = MyCachingHttpClientBuilder.create()
                 .setCacheConfig(cacheConfig)
 //                .setHttpCacheStorage(new BasicHttpCacheStorage(cacheConfig))
                 .setConnectionManager(poolingHttpClientConnectionManager)
