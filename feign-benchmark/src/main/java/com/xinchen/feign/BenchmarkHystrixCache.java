@@ -54,7 +54,7 @@ public class BenchmarkHystrixCache {
     private HystrixTestCacheInterface feignClient;
 
     // python -m httpbin.core --port 9000
-    @Param({"http://httpbin.org"})
+    @Param({"http://httpbin.org","http://localhost:9000"})
     private String targetUtl;
 
     @Param({"httpClient","cacheHttpClient","cacheableApacheHttpClient"})
@@ -124,8 +124,8 @@ public class BenchmarkHystrixCache {
     }
 
     @Benchmark
-    @Warmup(iterations = 5, time = 1)
-    @Measurement(iterations = 10, time = 1)
+    @Warmup(iterations = 3, time = 1)
+    @Measurement(iterations = 3, time = 1)
     @Fork(3)
     @BenchmarkMode(Mode.Throughput)
     @OutputTimeUnit(TimeUnit.SECONDS)
@@ -136,10 +136,12 @@ public class BenchmarkHystrixCache {
     }
 
 
-
-    @Headers("Accept: application/json")
+    /**
+     * 这里加Cache-Control是为了让client缓存生效
+     * */
+    @Headers({"Accept: application/json","Cache-Control: max-age=1000","Cache-Control: max-stale=1000"})
     interface HystrixTestCacheInterface {
-        @RequestLine("GET /get?Action=GetUser&Version=2010-05-08&limit=1")
+        @RequestLine("GET /get")
         HystrixCommand<String> query();
     }
 }
