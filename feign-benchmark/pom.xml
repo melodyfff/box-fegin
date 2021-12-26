@@ -17,6 +17,7 @@
     <feign.version>11.8</feign.version>
 
     <okhttp3.version>4.9.2</okhttp3.version>
+    <httpclient.version>4.5.13</httpclient.version>
     <slf4j.version>1.7.32</slf4j.version>
 
     <bouncy.version>1.70</bouncy.version>
@@ -41,6 +42,11 @@
     </dependency>
     <dependency>
       <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-httpclient</artifactId>
+      <version>${feign.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
       <artifactId>feign-jackson</artifactId>
       <version>${feign.version}</version>
     </dependency>
@@ -54,6 +60,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
       <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient-cache</artifactId>
+      <version>${httpclient.version}</version>
     </dependency>
 
     <dependency>
