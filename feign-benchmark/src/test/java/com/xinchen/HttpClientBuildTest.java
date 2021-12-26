@@ -24,6 +24,9 @@ import java.io.IOException;
  *
  * 注意观察{@link CachingExec}的执行过程，主要在 handleCacheHit() 方法调用中判断是否使用缓存，以请求的header中的Cache-Control为判断条件
  *
+ * 打印httpclient的日志可以通过在 jvm中添加：  -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog -Dorg.apache.commons.logging.simplelog.showdatetime=true -Dorg.apache.commons.logging.simplelog.log.org.apache.http=DEBUG -Dorg.apache.commons.logging.simplelog.showdatetime=true -Dorg.apache.commons.logging.simplelog.log.org.apache.http.client=DEBUG -Dorg.apache.commons.logging.simplelog.log.org.apache.http.impl.client=DEBUG
+ * 具体参考官网： https://hc.apache.org/httpcomponents-client-4.5.x/logging.html
+ *
  *
  * 以下两个值必须添加：
  * Cache-Control: max-age=<seconds>
