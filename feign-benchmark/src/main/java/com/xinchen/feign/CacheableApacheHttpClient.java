@@ -1,5 +1,7 @@
 package com.xinchen.feign;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import feign.Client;
 import feign.Request;
 import feign.Response;
@@ -36,7 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static feign.Util.UTF_8;
 
@@ -53,7 +55,11 @@ public class CacheableApacheHttpClient implements Client {
     private static final String ACCEPT_HEADER_NAME = "Accept";
 
     private final HttpClient client;
-    private final Map<String,CacheMeta> cachedMap = new ConcurrentHashMap<>();
+    private final Cache<String,CacheMeta> cachedMap = Caffeine.newBuilder()
+            .maximumSize(10_000)
+            .expireAfterWrite(1, TimeUnit.SECONDS).build();
+
+
 
     public CacheableApacheHttpClient() {
         this(HttpClientBuilder.create().build());
@@ -73,8 +79,8 @@ public class CacheableApacheHttpClient implements Client {
         }
 
         // 从缓存中获取，这里直接跳过client.execute
-        if (null!=cachedMap.get(cacheKeyFrom(request))){
-            final CacheMeta cacheMeta = cachedMap.get(cacheKeyFrom(request));
+        if (null!=cachedMap.getIfPresent(cacheKeyFrom(request))){
+            final CacheMeta cacheMeta = cachedMap.getIfPresent(cacheKeyFrom(request));
             return Response.builder()
                     .status(cacheMeta.statusCode)
                     .reason(cacheMeta.reason)
@@ -156,7 +162,7 @@ public class CacheableApacheHttpClient implements Client {
 
     private ContentType getContentType(Request request) {
         ContentType contentType = null;
-        for (Map.Entry<String, Collection<String>> entry : request.headers().entrySet())
+        for (Map.Entry<String, Collection<String>> entry : request.headers().entrySet()){
             if (entry.getKey().equalsIgnoreCase("Content-Type")) {
                 Collection<String> values = entry.getValue();
                 if (values != null && !values.isEmpty()) {
@@ -167,6 +173,7 @@ public class CacheableApacheHttpClient implements Client {
                     break;
                 }
             }
+        }
         return contentType;
     }
 
